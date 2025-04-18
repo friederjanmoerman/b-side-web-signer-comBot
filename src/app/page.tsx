@@ -21,9 +21,8 @@ const queryClient = new QueryClient()
 
 function Signer() {
   const searchParams = useSearchParams()
-  const wallet = searchParams.get("wallet") || ""
   const code = searchParams.get("code") || ""
-  const message = `Sign this message to verify for B Side:\nWallet: ${wallet}\nCode: ${code}`
+  const message = `Sign this message to verify for B Side:\n"Verify B Side | Code: ${code}"`
 
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
@@ -76,10 +75,11 @@ function Signer() {
                 readOnly
                 style={{ width: "100%", height: "100px", fontFamily: "monospace" }}
               />
-              {signature && <p style={{ color: "green", marginTop: "0.5rem" }}>✅ Copied to clipboard automatically</p>}
+              <p style={{ color: "green", marginTop: "0.5rem" }}>✅ Copied to clipboard automatically</p>
 
               <br />
               <button onClick={() => navigator.clipboard.writeText(signature || "")}>📋 Copy Signature</button>
+
               <p style={{ marginTop: "1rem" }}>Paste this signature into Discord to complete verification 🐝</p>
               <button onClick={() => disconnect()} style={{ marginTop: "1rem" }}>
                 Disconnect Wallet
