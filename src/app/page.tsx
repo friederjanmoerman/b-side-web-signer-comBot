@@ -85,8 +85,15 @@ function Signer() {
   }
 
   useEffect(() => {
-    if (signature) {
-      navigator.clipboard.writeText(signature)
+    if (signature && document.hasFocus()) {
+      navigator.clipboard
+        .writeText(signature)
+        .then(() => {
+          console.log("Signature copied to clipboard!")
+        })
+        .catch(err => {
+          console.warn("Clipboard copy failed:", err)
+        })
     }
   }, [signature])
 
