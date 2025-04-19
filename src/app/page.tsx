@@ -6,10 +6,11 @@ import { WagmiProvider, useAccount, useConnect, useDisconnect, useSignMessage, c
 import { mainnet } from "wagmi/chains"
 import { injected } from "wagmi/connectors"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { Button, Typography, Paper, Box, TextField, CssBaseline } from "@mui/material"
+import { Button, Typography, Paper, Box, CssBaseline } from "@mui/material"
 import { ThemeProvider, styled } from "@mui/material/styles"
 import "@fontsource/fredoka"
 import theme from "@/theme"
+import Image from "next/image"
 
 const config = createConfig({
   chains: [mainnet],
@@ -22,24 +23,29 @@ const config = createConfig({
 
 const queryClient = new QueryClient()
 
-const Container = styled(Box)(({ theme }) => ({
+const Container = styled(Box)(() => ({
   minHeight: "100vh",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  backgroundColor: theme.palette.background.default,
   padding: "2rem",
   color: "#fff",
+  position: "relative",
+  backgroundColor: theme.palette.background.paper,
 }))
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
+const StyledImage = styled(Image)(() => ({
+  marginBottom: "20px",
+}))
+
+const StyledModal = styled(Box)(({ theme }) => ({
   padding: "2rem",
   maxWidth: 600,
   width: "100%",
   textAlign: "center",
   backgroundColor: theme.palette.background.paper,
-  boxShadow: "0 0 24px rgba(0,0,0,0.3)",
+  position: "relative",
 }))
 
 const StyledButton = styled(Button)(() => ({
@@ -86,10 +92,8 @@ function Signer() {
 
   return (
     <Container>
-      <StyledPaper elevation={6}>
-        <Typography variant="h4" gutterBottom>
-          B Side Verification
-        </Typography>
+      <StyledModal>
+        <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} />
 
         {!isConnected ? (
           <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
@@ -99,16 +103,12 @@ function Signer() {
           <>
             <Typography gutterBottom>Connected Wallet: {address}</Typography>
 
-            <Typography gutterBottom>Message to Sign:</Typography>
+            <Typography gutterBottom>Sign to verify:</Typography>
             {user && (
               <Typography variant="caption" sx={{ opacity: 0.6 }}>
                 Verifying Discord User ID: {user}
               </Typography>
             )}
-
-            <Paper sx={{ padding: 2, mt: 1, mb: 2, backgroundColor: "#2c3752", color: "#fff" }}>
-              <Typography>{message}</Typography>
-            </Paper>
 
             <StyledButton variant="contained" onClick={handleSign}>
               Sign message
@@ -116,18 +116,9 @@ function Signer() {
 
             {signature && (
               <Box mt={4}>
-                <Typography>✅ Signature:</Typography>
-                <TextField
-                  multiline
-                  fullWidth
-                  value={signature}
-                  InputProps={{ readOnly: true }}
-                  sx={{ mt: 1, backgroundColor: "#f5f5f5", borderRadius: 2 }}
-                />
-                <Typography variant="caption" color="success.main" mt={1} display="block">
-                  Copied to clipboard automatically
-                </Typography>
-
+                <Paper sx={{ padding: 2, mt: 1, mb: 2, backgroundColor: "#2c3752", color: "#fff", textWrap: "wrap" }}>
+                  <div>{signature}</div>
+                </Paper>
                 <Button
                   variant="outlined"
                   onClick={() => navigator.clipboard.writeText(signature)}
@@ -136,20 +127,19 @@ function Signer() {
                   Copy Signature
                 </Button>
 
-                <Typography mt={2}>Paste this signature in Discord to complete verification 🐝</Typography>
-
-                <StyledButton variant="text" color="secondary" onClick={() => disconnect()} sx={{ mt: 2 }}>
-                  Disconnect Wallet
-                </StyledButton>
-
-                <Typography variant="caption" sx={{ opacity: 0.6, fontStyle: "italic", mt: 4 }}>
-                  No sensitive data. No tokens. No wallet exposure.
-                </Typography>
+                <Typography mt={2}>Paste this signature in Discord to complete verification.</Typography>
               </Box>
             )}
+
+            <StyledButton variant="text" color="secondary" onClick={() => disconnect()} sx={{ mt: 2 }}>
+              Disconnect Wallet
+            </StyledButton>
           </>
         )}
-      </StyledPaper>
+        <Typography variant="caption" sx={{ opacity: 0.6, fontStyle: "italic", mt: 4 }}>
+          No sensitive data. No transactions. No wallet exposure.
+        </Typography>
+      </StyledModal>
     </Container>
   )
 }
