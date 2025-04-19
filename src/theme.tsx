@@ -1,4 +1,3 @@
-// src/theme.ts
 "use client"
 
 import { createTheme } from "@mui/material"
@@ -18,16 +17,10 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: `"Fredoka", "Comic Neue", sans-serif`,
+    fontFamily: "'Futura BT', sans-serif",
     h1: {
       fontWeight: 700,
     },
-    body1: {
-      fontSize: "1.1rem",
-    },
-  },
-  shape: {
-    borderRadius: 16,
   },
 })
 

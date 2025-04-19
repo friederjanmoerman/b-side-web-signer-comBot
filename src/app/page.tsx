@@ -42,6 +42,20 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   boxShadow: "0 0 24px rgba(0,0,0,0.3)",
 }))
 
+const StyledButton = styled(Button)(() => ({
+  cursor: "pointer",
+  padding: "15px 50px",
+  background: "#fde58b",
+  transition: "all .4s ease-out",
+  color: "#336",
+  borderRadius: "5px",
+  fontSize: "14px",
+  textTransform: "uppercase",
+  display: "flex",
+  justifyContent: "center",
+  margin: "0 auto",
+}))
+
 function Signer() {
   const searchParams = useSearchParams()
   const code = searchParams.get("code") || ""
@@ -73,35 +87,29 @@ function Signer() {
     <Container>
       <StyledPaper elevation={6}>
         <Typography variant="h4" gutterBottom>
-          🐝 B Side Wallet Verifier
+          B Side Verification
         </Typography>
 
         {!isConnected ? (
-          <Button variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
+          <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
             Connect Wallet
-          </Button>
+          </StyledButton>
         ) : (
           <>
-            <Typography variant="body1" gutterBottom>
-              <strong>Connected Wallet:</strong> {address}
-            </Typography>
+            <Typography gutterBottom>Connected Wallet: {address}</Typography>
 
-            <Typography variant="body1" gutterBottom>
-              <strong>Message to Sign:</strong>
-            </Typography>
+            <Typography gutterBottom>Message to Sign:</Typography>
             <Paper sx={{ padding: 2, mt: 1, mb: 2, backgroundColor: "#2c3752", color: "#fff" }}>
-              <Typography component="pre" fontFamily="monospace" fontSize="0.95rem">
-                {message}
-              </Typography>
+              <Typography>{message}</Typography>
             </Paper>
 
-            <Button variant="contained" onClick={handleSign}>
-              ✍️ Sign Message
-            </Button>
+            <StyledButton variant="contained" onClick={handleSign}>
+              Sign message
+            </StyledButton>
 
             {signature && (
               <Box mt={4}>
-                <Typography variant="body1">✅ Signature:</Typography>
+                <Typography>✅ Signature:</Typography>
                 <TextField
                   multiline
                   fullWidth
@@ -118,16 +126,14 @@ function Signer() {
                   onClick={() => navigator.clipboard.writeText(signature)}
                   sx={{ mt: 2, mr: 2 }}
                 >
-                  📋 Copy Signature
+                  Copy Signature
                 </Button>
 
-                <Typography variant="body2" mt={2}>
-                  Paste this signature in Discord to complete verification 🐝
-                </Typography>
+                <Typography mt={2}>Paste this signature in Discord to complete verification 🐝</Typography>
 
-                <Button variant="text" color="secondary" onClick={() => disconnect()} sx={{ mt: 2 }}>
+                <StyledButton variant="text" color="secondary" onClick={() => disconnect()} sx={{ mt: 2 }}>
                   Disconnect Wallet
-                </Button>
+                </StyledButton>
               </Box>
             )}
           </>
