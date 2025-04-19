@@ -59,7 +59,8 @@ const StyledButton = styled(Button)(() => ({
 function Signer() {
   const searchParams = useSearchParams()
   const code = searchParams.get("code") || ""
-  const message = `Sign this message to verify for B Side:\n"Verify B Side | Code: ${code}"`
+  const user = searchParams.get("user") || ""
+  const message = `Sign this message to verify for B Side:\n"Verify B Side | Code: ${code} | User: ${user}"`
 
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
@@ -99,6 +100,12 @@ function Signer() {
             <Typography gutterBottom>Connected Wallet: {address}</Typography>
 
             <Typography gutterBottom>Message to Sign:</Typography>
+            {user && (
+              <Typography variant="caption" sx={{ opacity: 0.6 }}>
+                Verifying Discord User ID: {user}
+              </Typography>
+            )}
+
             <Paper sx={{ padding: 2, mt: 1, mb: 2, backgroundColor: "#2c3752", color: "#fff" }}>
               <Typography>{message}</Typography>
             </Paper>
@@ -134,6 +141,10 @@ function Signer() {
                 <StyledButton variant="text" color="secondary" onClick={() => disconnect()} sx={{ mt: 2 }}>
                   Disconnect Wallet
                 </StyledButton>
+
+                <Typography variant="caption" sx={{ opacity: 0.6, fontStyle: "italic", mt: 4 }}>
+                  No sensitive data. No tokens. No wallet exposure.
+                </Typography>
               </Box>
             )}
           </>
