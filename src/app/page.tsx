@@ -38,10 +38,10 @@ const StyledWrapper = styled("div")(() => ({
 }))
 
 const StyledImgWrapper = styled("div")(() => ({
-  flex: 1,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  flexDirection: "column",
   animation: "float 3s ease-in-out infinite",
   "@keyframes float": {
     "0%": { transform: "translateY(0px)" },
@@ -51,7 +51,6 @@ const StyledImgWrapper = styled("div")(() => ({
 }))
 
 const StyledDisplayWrapper = styled("div")(() => ({
-  flex: 2,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -83,6 +82,7 @@ const StyledModal = styled(Box)(() => ({
   textAlign: "center",
   position: "relative",
   display: "flex",
+  flexDirection: "column",
 }))
 
 const StyledButton = styled(Button)(() => ({
@@ -123,7 +123,9 @@ const StyledFooter = styled("div")({
   bottom: "20px",
 })
 
-const StyledConversation = styled("div")({})
+const StyledConversation = styled("div")({
+  margin: "10px",
+})
 
 const StyledDisconnectButton = styled(Button)(() => ({
   cursor: "pointer",
@@ -208,7 +210,7 @@ function Signer() {
       <Container>
         <StyledModal>
           <StyledImgWrapper>
-            <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} animate={isHovered} />
+            <StyledImage src="/img/combot-blur-comb.png" alt="ComBot" width={120} height={120} animate={isHovered} />
           </StyledImgWrapper>
           <StyledDisplayWrapper onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             {phase === "connect" && (
