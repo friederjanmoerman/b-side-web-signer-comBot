@@ -39,10 +39,27 @@ const StyledWrapper = styled("div")(() => ({
 
 const StyledImgWrapper = styled("div")(() => ({
   flex: 1,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  animation: "float 3s ease-in-out infinite",
+  "@keyframes float": {
+    "0%": { transform: "translateY(0px)" },
+    "50%": { transform: "translateY(-10px)" },
+    "100%": { transform: "translateY(0px)" },
+  },
 }))
 
 const StyledDisplayWrapper = styled("div")(() => ({
   flex: 2,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column",
+  gap: "4px",
+  borderRadius: "5px",
+  border: "2px solid #f9e697",
+  padding: "20px 10px",
 }))
 
 const Container = styled(Box)(() => ({
@@ -56,8 +73,10 @@ const Container = styled(Box)(() => ({
   position: "relative",
 }))
 
-const StyledImage = styled(Image)(() => ({
-  marginBottom: "20px",
+const StyledImage = styled(Image)<{ animate: boolean }>(({ animate }) => ({
+  marginBottom: "70px",
+  transition: "transform 0.4s ease",
+  transform: animate ? "scale(1.05) rotate(-3deg)" : "none",
 }))
 
 const StyledModal = styled(Box)(() => ({
@@ -131,6 +150,8 @@ const StyledDisclaimer = styled(Typography)(() => ({
   fontStyle: "italic",
 }))
 
+type Phase = "connect" | "verify" | "signed"
+
 function Signer() {
   const searchParams = useSearchParams()
   const code = searchParams.get("code") || ""
@@ -143,6 +164,8 @@ function Signer() {
   const { signMessageAsync } = useSignMessage()
 
   const [signature, setSignature] = useState<string | null>(null)
+  const [phase, setPhase] = useState<Phase>("connect")
+  const [isHovered, setIsHovered] = useState(false)
 
   const handleSign = async () => {
     try {
@@ -153,16 +176,30 @@ function Signer() {
     }
   }
 
+  // Set phase based on connection
+  useEffect(() => {
+    if (isConnected) {
+      setPhase("verify")
+    } else {
+      setPhase("connect")
+      setSignature(null)
+    }
+  }, [isConnected])
+
+  // Move to 'signed' when signature is available
+  useEffect(() => {
+    if (signature) {
+      setPhase("signed")
+    }
+  }, [signature])
+
+  // Copy to clipboard when signed
   useEffect(() => {
     if (signature && document.hasFocus()) {
       navigator.clipboard
         .writeText(signature)
-        .then(() => {
-          console.log("Signature copied to clipboard!")
-        })
-        .catch(err => {
-          console.warn("Clipboard copy failed:", err)
-        })
+        .then(() => console.log("Signature copied to clipboard!"))
+        .catch(err => console.warn("Clipboard copy failed:", err))
     }
   }, [signature])
 
@@ -172,48 +209,41 @@ function Signer() {
       <Container>
         <StyledModal>
           <StyledImgWrapper>
-            <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} />
+            <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} animate={isHovered} />
           </StyledImgWrapper>
-          <StyledDisplayWrapper>
-            {!isConnected ? (
-              <>
-                <Typography gutterBottom>Sign to verify:</Typography>
-                <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
-                  Connect Wallet
-                </StyledButton>
-              </>
-            ) : (
-              <>
-                <Typography gutterBottom>Sign to verify:</Typography>
-                {user && (
-                  <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                    Verifying Discord User ID: {user}
-                  </Typography>
-                )}
+          <StyledDisplayWrapper onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+            {phase === "connect" && (
+              <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
+                Connect Wallet
+              </StyledButton>
+            )}
 
+            {phase === "verify" && (
+              <>
+                {/* )} */}
                 <StyledButton variant="contained" onClick={handleSign}>
-                  Sign message
+                  Sign to verify
                 </StyledButton>
+                {/* {user && ( */}
+                <Typography variant="caption" sx={{ opacity: 0.6 }}>
+                  Verifying Discord User ID: {user}
+                </Typography>
+              </>
+            )}
 
-                {signature && (
-                  <Box mt={4}>
-                    <StyledSignature>{signature}</StyledSignature>
-                    <Button
-                      variant="outlined"
-                      onClick={() => navigator.clipboard.writeText(signature)}
-                      sx={{ mt: 2, mr: 2 }}
-                    >
-                      Copy Signature
-                    </Button>
-
-                    <Typography mt={2}>Paste this signature in Discord to complete verification.</Typography>
-                  </Box>
-                )}
+            {phase === "signed" && signature && (
+              <>
+                <StyledSignature>{signature}</StyledSignature>
+                <StyledButton onClick={() => navigator.clipboard.writeText(signature)} sx={{ mt: 2 }}>
+                  Copy Signature
+                </StyledButton>
+                <Typography mt={2}>Paste this signature in Discord to complete verification.</Typography>
               </>
             )}
           </StyledDisplayWrapper>
         </StyledModal>
       </Container>
+
       <StyledFooter>
         {!isConnected ? (
           <Typography gutterBottom>No wallet connected.</Typography>
