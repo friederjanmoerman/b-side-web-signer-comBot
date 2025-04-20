@@ -31,15 +31,6 @@ const StyledLogo = styled(Image)(() => ({
   filter: "invert(81%) sepia(56%) saturate(343%) hue-rotate(346deg) brightness(106%) contrast(98%)",
 }))
 
-const StyledDisclaimer = styled(Typography)(() => ({
-  opacity: 0.6,
-  fontStyle: "italic",
-  position: "fixed",
-  bottom: "20px",
-  left: "50%",
-  transform: "translateX(-50%)",
-}))
-
 const StyledWrapper = styled("div")(() => ({
   height: "100%",
   width: "100%",
@@ -61,12 +52,11 @@ const StyledImage = styled(Image)(() => ({
   marginBottom: "20px",
 }))
 
-const StyledModal = styled(Box)(({ theme }) => ({
+const StyledModal = styled(Box)(() => ({
   padding: "2rem",
   maxWidth: 600,
   width: "100%",
   textAlign: "center",
-  backgroundColor: theme.palette.background.paper,
   position: "relative",
   display: "flex",
 }))
@@ -83,6 +73,10 @@ const StyledButton = styled(Button)(() => ({
   display: "flex",
   justifyContent: "center",
   margin: "0 auto",
+  boxShadow: "none",
+  "&:hover": {
+    boxShadow: "none",
+  },
 }))
 
 const StyledSignature = styled("div")({
@@ -94,6 +88,40 @@ const StyledSignature = styled("div")({
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
 })
+
+const StyledFooter = styled("div")({
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  position: "fixed",
+  bottom: "20px",
+})
+
+const StyledDisconnectButton = styled(Button)(() => ({
+  cursor: "pointer",
+  background: "transparent",
+  color: "#fdf16d",
+  fontSize: "9px",
+  textTransform: "uppercase",
+  display: "flex",
+  justifyContent: "center",
+  margin: "0 auto",
+  borderBottom: "2px solid #fdf16d",
+  boxShadow: "none",
+  padding: "0 0 4px 0",
+  borderRadius: 0,
+  marginBottom: "10px",
+  "&:hover": {
+    boxShadow: "none",
+  },
+}))
+
+const StyledDisclaimer = styled(Typography)(() => ({
+  opacity: 0.6,
+  fontStyle: "italic",
+}))
 
 function Signer() {
   const searchParams = useSearchParams()
@@ -145,8 +173,6 @@ function Signer() {
               </StyledButton>
             ) : (
               <>
-                <Typography gutterBottom>Connected Wallet: {address}</Typography>
-
                 <Typography gutterBottom>Sign to verify:</Typography>
                 {user && (
                   <Typography variant="caption" sx={{ opacity: 0.6 }}>
@@ -177,7 +203,19 @@ function Signer() {
           </div>
         </StyledModal>
       </Container>
-      <StyledDisclaimer variant="caption">No sensitive data. No transactions. No wallet exposure.</StyledDisclaimer>
+      <StyledFooter>
+        {!isConnected ? (
+          <Typography gutterBottom>No wallet connected.</Typography>
+        ) : (
+          <>
+            <Typography gutterBottom>{address}</Typography>
+            <StyledDisconnectButton variant="contained" color="primary" onClick={() => disconnect()}>
+              Disconnect Wallet
+            </StyledDisconnectButton>
+          </>
+        )}
+        <StyledDisclaimer variant="caption">No sensitive data. No transactions. No wallet exposure.</StyledDisclaimer>
+      </StyledFooter>
     </StyledWrapper>
   )
 }
