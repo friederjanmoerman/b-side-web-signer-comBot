@@ -57,9 +57,6 @@ const StyledDisplayWrapper = styled("div")(() => ({
   justifyContent: "center",
   flexDirection: "column",
   gap: "4px",
-  borderRadius: "5px",
-  border: "2px solid #f9e697",
-  padding: "20px 10px",
 }))
 
 const Container = styled(Box)(() => ({
@@ -125,6 +122,8 @@ const StyledFooter = styled("div")({
   position: "fixed",
   bottom: "20px",
 })
+
+const StyledConversation = styled("div")({})
 
 const StyledDisconnectButton = styled(Button)(() => ({
   cursor: "pointer",
@@ -213,21 +212,20 @@ function Signer() {
           </StyledImgWrapper>
           <StyledDisplayWrapper onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             {phase === "connect" && (
-              <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
-                Connect Wallet
-              </StyledButton>
+              <>
+                <StyledConversation>Beep boop!</StyledConversation>
+                <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
+                  Connect Wallet
+                </StyledButton>
+              </>
             )}
 
             {phase === "verify" && (
               <>
-                {/* )} */}
+                <StyledConversation>Bzzzign to Verify, Beep. </StyledConversation>
                 <StyledButton variant="contained" onClick={handleSign}>
                   Sign to verify
                 </StyledButton>
-                {/* {user && ( */}
-                <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                  Verifying Discord User ID: {user}
-                </Typography>
               </>
             )}
 
@@ -237,7 +235,7 @@ function Signer() {
                 <StyledButton onClick={() => navigator.clipboard.writeText(signature)} sx={{ mt: 2 }}>
                   Copy Signature
                 </StyledButton>
-                <Typography mt={2}>Paste this signature in Discord to complete verification.</Typography>
+                <StyledConversation>Paste this Bzzignature in Discord to comBlete verification.</StyledConversation>
               </>
             )}
           </StyledDisplayWrapper>
