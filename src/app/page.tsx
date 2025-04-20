@@ -6,7 +6,7 @@ import { WagmiProvider, useAccount, useConnect, useDisconnect, useSignMessage, c
 import { mainnet } from "wagmi/chains"
 import { injected } from "wagmi/connectors"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { Button, Typography, Paper, Box, CssBaseline } from "@mui/material"
+import { Button, Typography, Box, CssBaseline } from "@mui/material"
 import { ThemeProvider, styled } from "@mui/material/styles"
 import "@fontsource/fredoka"
 import theme from "@/theme"
@@ -23,6 +23,29 @@ const config = createConfig({
 
 const queryClient = new QueryClient()
 
+const StyledLogo = styled(Image)(() => ({
+  position: "fixed",
+  top: "20px",
+  left: "50%",
+  transform: "translateX(-50%)",
+  filter: "invert(81%) sepia(56%) saturate(343%) hue-rotate(346deg) brightness(106%) contrast(98%)",
+}))
+
+const StyledDisclaimer = styled(Typography)(() => ({
+  opacity: 0.6,
+  fontStyle: "italic",
+  position: "fixed",
+  bottom: "20px",
+  left: "50%",
+  transform: "translateX(-50%)",
+}))
+
+const StyledWrapper = styled("div")(() => ({
+  height: "100%",
+  width: "100%",
+  position: "relative",
+}))
+
 const Container = styled(Box)(() => ({
   minHeight: "100vh",
   display: "flex",
@@ -32,7 +55,6 @@ const Container = styled(Box)(() => ({
   padding: "2rem",
   color: "#fff",
   position: "relative",
-  backgroundColor: theme.palette.background.paper,
 }))
 
 const StyledImage = styled(Image)(() => ({
@@ -46,6 +68,7 @@ const StyledModal = styled(Box)(({ theme }) => ({
   textAlign: "center",
   backgroundColor: theme.palette.background.paper,
   position: "relative",
+  display: "flex",
 }))
 
 const StyledButton = styled(Button)(() => ({
@@ -61,6 +84,16 @@ const StyledButton = styled(Button)(() => ({
   justifyContent: "center",
   margin: "0 auto",
 }))
+
+const StyledSignature = styled("div")({
+  overflow: "hidden",
+  maxWidth: "220px",
+  height: "20px",
+  fontWeight: "500",
+  fontSize: "13px",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+})
 
 function Signer() {
   const searchParams = useSearchParams()
@@ -98,56 +131,54 @@ function Signer() {
   }, [signature])
 
   return (
-    <Container>
-      <StyledModal>
-        <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} />
+    <StyledWrapper>
+      <StyledLogo src="/img/logo.svg" alt="B Side logo" width={40} height={40} />
+      <Container>
+        <StyledModal>
+          <div>
+            <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} />
+          </div>
+          <div>
+            {!isConnected ? (
+              <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
+                Connect Wallet
+              </StyledButton>
+            ) : (
+              <>
+                <Typography gutterBottom>Connected Wallet: {address}</Typography>
 
-        {!isConnected ? (
-          <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
-            Connect Wallet
-          </StyledButton>
-        ) : (
-          <>
-            <Typography gutterBottom>Connected Wallet: {address}</Typography>
+                <Typography gutterBottom>Sign to verify:</Typography>
+                {user && (
+                  <Typography variant="caption" sx={{ opacity: 0.6 }}>
+                    Verifying Discord User ID: {user}
+                  </Typography>
+                )}
 
-            <Typography gutterBottom>Sign to verify:</Typography>
-            {user && (
-              <Typography variant="caption" sx={{ opacity: 0.6 }}>
-                Verifying Discord User ID: {user}
-              </Typography>
+                <StyledButton variant="contained" onClick={handleSign}>
+                  Sign message
+                </StyledButton>
+
+                {signature && (
+                  <Box mt={4}>
+                    <StyledSignature>{signature}</StyledSignature>
+                    <Button
+                      variant="outlined"
+                      onClick={() => navigator.clipboard.writeText(signature)}
+                      sx={{ mt: 2, mr: 2 }}
+                    >
+                      Copy Signature
+                    </Button>
+
+                    <Typography mt={2}>Paste this signature in Discord to complete verification.</Typography>
+                  </Box>
+                )}
+              </>
             )}
-
-            <StyledButton variant="contained" onClick={handleSign}>
-              Sign message
-            </StyledButton>
-
-            {signature && (
-              <Box mt={4}>
-                <Paper sx={{ padding: 2, mt: 1, mb: 2, backgroundColor: "#2c3752", color: "#fff", textWrap: "wrap" }}>
-                  <div>{signature}</div>
-                </Paper>
-                <Button
-                  variant="outlined"
-                  onClick={() => navigator.clipboard.writeText(signature)}
-                  sx={{ mt: 2, mr: 2 }}
-                >
-                  Copy Signature
-                </Button>
-
-                <Typography mt={2}>Paste this signature in Discord to complete verification.</Typography>
-              </Box>
-            )}
-
-            <StyledButton variant="text" color="secondary" onClick={() => disconnect()} sx={{ mt: 2 }}>
-              Disconnect Wallet
-            </StyledButton>
-          </>
-        )}
-        <Typography variant="caption" sx={{ opacity: 0.6, fontStyle: "italic", mt: 4 }}>
-          No sensitive data. No transactions. No wallet exposure.
-        </Typography>
-      </StyledModal>
-    </Container>
+          </div>
+        </StyledModal>
+      </Container>
+      <StyledDisclaimer variant="caption">No sensitive data. No transactions. No wallet exposure.</StyledDisclaimer>
+    </StyledWrapper>
   )
 }
 
