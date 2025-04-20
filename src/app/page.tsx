@@ -37,6 +37,14 @@ const StyledWrapper = styled("div")(() => ({
   position: "relative",
 }))
 
+const StyledImgWrapper = styled("div")(() => ({
+  flex: 1,
+}))
+
+const StyledDisplayWrapper = styled("div")(() => ({
+  flex: 2,
+}))
+
 const Container = styled(Box)(() => ({
   minHeight: "100vh",
   display: "flex",
@@ -163,14 +171,17 @@ function Signer() {
       <StyledLogo src="/img/logo.svg" alt="B Side logo" width={40} height={40} />
       <Container>
         <StyledModal>
-          <div>
+          <StyledImgWrapper>
             <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} />
-          </div>
-          <div>
+          </StyledImgWrapper>
+          <StyledDisplayWrapper>
             {!isConnected ? (
-              <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
-                Connect Wallet
-              </StyledButton>
+              <>
+                <Typography gutterBottom>Sign to verify:</Typography>
+                <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
+                  Connect Wallet
+                </StyledButton>
+              </>
             ) : (
               <>
                 <Typography gutterBottom>Sign to verify:</Typography>
@@ -200,7 +211,7 @@ function Signer() {
                 )}
               </>
             )}
-          </div>
+          </StyledDisplayWrapper>
         </StyledModal>
       </Container>
       <StyledFooter>
