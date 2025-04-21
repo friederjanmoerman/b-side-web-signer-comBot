@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { WagmiProvider, useAccount, useConnect, useDisconnect, useSignMessage, createConfig, http } from "wagmi"
 import { mainnet } from "wagmi/chains"
@@ -23,56 +23,14 @@ const config = createConfig({
 
 const queryClient = new QueryClient()
 
-const StyledLogo = styled(Image)(() => ({
-  position: "fixed",
-  top: "20px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  filter: "invert(81%) sepia(56%) saturate(343%) hue-rotate(346deg) brightness(106%) contrast(98%)",
-}))
+type StyledImageProps = {
+  animate?: boolean
+}
 
 const StyledWrapper = styled("div")(() => ({
   height: "100%",
   width: "100%",
   position: "relative",
-}))
-
-const StyledImgWrapper = styled("div")(() => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  animation: "float 3s ease-in-out infinite",
-  "@keyframes float": {
-    "0%": { transform: "translateY(0px)" },
-    "50%": { transform: "translateY(-10px)" },
-    "100%": { transform: "translateY(0px)" },
-  },
-}))
-
-const StyledDisplayWrapper = styled("div")(() => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  gap: "4px",
-}))
-
-const Container = styled(Box)(() => ({
-  minHeight: "100vh",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: "2rem",
-  color: "#fff",
-  position: "relative",
-}))
-
-const StyledImage = styled(Image)<{ animate: boolean }>(({ animate }) => ({
-  marginBottom: "70px",
-  transition: "transform 0.4s ease",
-  transform: animate ? "scale(1.05) rotate(-3deg)" : "none",
 }))
 
 const StyledModal = styled(Box)(() => ({
@@ -83,6 +41,7 @@ const StyledModal = styled(Box)(() => ({
   position: "relative",
   display: "flex",
   flexDirection: "column",
+  marginTop: "15vh",
 }))
 
 const StyledButton = styled(Button)(() => ({
@@ -103,7 +62,33 @@ const StyledButton = styled(Button)(() => ({
   },
 }))
 
-const StyledSignature = styled("div")({
+const StyledLogo = styled(Image)(() => ({
+  position: "fixed",
+  top: "20px",
+  left: "50%",
+  transform: "translateX(-50%)",
+  filter: "invert(81%) sepia(56%) saturate(343%) hue-rotate(346deg) brightness(106%) contrast(98%)",
+  zIndex: 10,
+}))
+
+const StyledConversation = styled("div")(() => ({
+  margin: "10px",
+  whiteSpace: "pre-wrap",
+  overflow: "hidden",
+  position: "relative",
+  height: "24px",
+
+  "& .textbox__underscore": {
+    animation: "blink 0.7s steps(2, start) infinite",
+  },
+
+  "@keyframes blink": {
+    "0%, 100%": { opacity: 1 },
+    "50%": { opacity: 0 },
+  },
+}))
+
+const StyledSignature = styled("div")(() => ({
   overflow: "hidden",
   maxWidth: "220px",
   height: "20px",
@@ -111,9 +96,10 @@ const StyledSignature = styled("div")({
   fontSize: "13px",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
-})
+  marginTop: "10px",
+}))
 
-const StyledFooter = styled("div")({
+const StyledFooter = styled("div")(() => ({
   width: "100%",
   display: "flex",
   flexDirection: "column",
@@ -121,11 +107,7 @@ const StyledFooter = styled("div")({
   justifyContent: "center",
   position: "fixed",
   bottom: "20px",
-})
-
-const StyledConversation = styled("div")({
-  margin: "10px",
-})
+}))
 
 const StyledDisconnectButton = styled(Button)(() => ({
   cursor: "pointer",
@@ -151,7 +133,76 @@ const StyledDisclaimer = styled(Typography)(() => ({
   fontStyle: "italic",
 }))
 
-type Phase = "connect" | "verify" | "signed"
+const Container = styled(Box)(() => ({
+  minHeight: "100vh",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  padding: "2rem",
+  color: "#fff",
+  position: "relative",
+}))
+
+const StyledContentWrapper = styled("div")(() => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column",
+  gap: "4px",
+  textAlign: "center",
+  padding: "1rem",
+}))
+
+const StyledImgWrapper = styled("div")(() => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column",
+  animation: "float 3s ease-in-out infinite",
+  "@keyframes float": {
+    "0%": { transform: "translateY(0px)" },
+    "50%": { transform: "translateY(-10px)" },
+    "100%": { transform: "translateY(0px)" },
+  },
+}))
+
+const StyledImage = styled(Image)<StyledImageProps>(({ animate }) => ({
+  marginBottom: "70px",
+  transition: "transform 0.4s ease",
+  transform: animate ? "scale(1.05) rotate(-3deg)" : "none",
+}))
+
+function Typewriter({ text }: { text: string }) {
+  const ref = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    let i = 0
+    let cancelled = false
+
+    function type() {
+      if (cancelled || !el) return
+      if (i < text.length) {
+        el.innerHTML = text.substring(0, i + 1) + '<span aria-hidden="true" class="textbox__underscore">&#95;</span>'
+        i++
+        setTimeout(type, 40)
+      } else {
+        el.innerHTML = text
+      }
+    }
+
+    el.innerHTML = ""
+    type()
+
+    return () => {
+      cancelled = true
+    }
+  }, [text])
+
+  return <StyledConversation ref={ref} />
+}
 
 function Signer() {
   const searchParams = useSearchParams()
@@ -165,7 +216,7 @@ function Signer() {
   const { signMessageAsync } = useSignMessage()
 
   const [signature, setSignature] = useState<string | null>(null)
-  const [phase, setPhase] = useState<Phase>("connect")
+  const [phase, setPhase] = useState("connect")
   const [isHovered, setIsHovered] = useState(false)
 
   const handleSign = async () => {
@@ -177,7 +228,6 @@ function Signer() {
     }
   }
 
-  // Set phase based on connection
   useEffect(() => {
     if (isConnected) {
       setPhase("verify")
@@ -187,20 +237,15 @@ function Signer() {
     }
   }, [isConnected])
 
-  // Move to 'signed' when signature is available
   useEffect(() => {
     if (signature) {
       setPhase("signed")
     }
   }, [signature])
 
-  // Copy to clipboard when signed
   useEffect(() => {
     if (signature && document.hasFocus()) {
-      navigator.clipboard
-        .writeText(signature)
-        .then(() => console.log("Signature copied to clipboard!"))
-        .catch(err => console.warn("Clipboard copy failed:", err))
+      navigator.clipboard.writeText(signature).catch(err => console.warn("Clipboard copy failed:", err))
     }
   }, [signature])
 
@@ -210,49 +255,39 @@ function Signer() {
       <Container>
         <StyledModal>
           <StyledImgWrapper>
-            <StyledImage src="/img/combot-blur-comb.png" alt="ComBot" width={120} height={120} animate={isHovered} />
+            <StyledImage src="/img/combot.png" alt="ComBot" width={120} height={120} animate={isHovered} />
           </StyledImgWrapper>
-          <StyledDisplayWrapper onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+          <StyledContentWrapper onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             {phase === "connect" && (
               <>
-                <StyledConversation>Beep boop!</StyledConversation>
-                <StyledButton variant="contained" color="primary" onClick={() => connect({ connector: connectors[0] })}>
-                  Connect Wallet
-                </StyledButton>
+                <Typewriter text="Beep boop!" />
+                <StyledButton onClick={() => connect({ connector: connectors[0] })}>Connect Wallet</StyledButton>
               </>
             )}
-
             {phase === "verify" && (
               <>
-                <StyledConversation>Bzzzign to Verify, Beep. </StyledConversation>
-                <StyledButton variant="contained" onClick={handleSign}>
-                  Sign to verify
-                </StyledButton>
+                <Typewriter text="Bzzign to Verify, Beep." />
+                <StyledButton onClick={handleSign}>Sign to verify</StyledButton>
               </>
             )}
-
             {phase === "signed" && signature && (
               <>
                 <StyledSignature>{signature}</StyledSignature>
-                <StyledButton onClick={() => navigator.clipboard.writeText(signature)} sx={{ mt: 2 }}>
-                  Copy Signature
-                </StyledButton>
-                <StyledConversation>Paste this Bzzignature in Discord to comBlete verification.</StyledConversation>
+                <StyledButton onClick={() => navigator.clipboard.writeText(signature)}>Copy Signature</StyledButton>
+                <Typewriter text="Paste this Bzzignature in Discord to comBlete verification." />
               </>
             )}
-          </StyledDisplayWrapper>
+          </StyledContentWrapper>
         </StyledModal>
       </Container>
 
       <StyledFooter>
         {!isConnected ? (
-          <Typography gutterBottom>No wallet connected.</Typography>
+          <Typography>No wallet connected.</Typography>
         ) : (
           <>
-            <Typography gutterBottom>{address}</Typography>
-            <StyledDisconnectButton variant="contained" color="primary" onClick={() => disconnect()}>
-              Disconnect Wallet
-            </StyledDisconnectButton>
+            <Typography>{address}</Typography>
+            <StyledDisconnectButton onClick={() => disconnect()}>Disconnect Wallet</StyledDisconnectButton>
           </>
         )}
         <StyledDisclaimer variant="caption">No sensitive data. No transactions. No wallet exposure.</StyledDisclaimer>
