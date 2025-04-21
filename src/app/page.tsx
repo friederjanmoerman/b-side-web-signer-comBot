@@ -6,7 +6,7 @@ import { WagmiProvider, useAccount, useConnect, useDisconnect, useSignMessage, c
 import { mainnet } from "wagmi/chains"
 import { injected } from "wagmi/connectors"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { Button, Typography, Box, CssBaseline } from "@mui/material"
+import { Button, Link, Typography, Box, CssBaseline } from "@mui/material"
 import { ThemeProvider, styled } from "@mui/material/styles"
 import "@fontsource/fredoka"
 import theme from "@/theme"
@@ -167,7 +167,7 @@ const StyledImgWrapper = styled("div")(() => ({
 }))
 
 const StyledImage = styled(Image)<StyledImageProps>(({ animate }) => ({
-  marginBottom: "70px",
+  marginBottom: "20px",
   transition: "transform 0.4s ease",
   transform: animate ? "scale(1.05) rotate(-3deg)" : "none",
 }))
@@ -251,7 +251,9 @@ function Signer() {
 
   return (
     <StyledWrapper>
-      <StyledLogo src="/img/logo.svg" alt="B Side logo" width={40} height={40} />
+      <Link href="https://bombolabs.xyz">
+        <StyledLogo src="/img/logo.svg" alt="B Side logo" width={40} height={40} />
+      </Link>
       <Container>
         <StyledModal>
           <StyledImgWrapper>
